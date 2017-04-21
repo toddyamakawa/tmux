@@ -2,11 +2,13 @@
 local here=${0:h}
 which bjobs &> /dev/null || exit
 
-red="#[fg=colour9]"
-yellow="#[fg=colour11]"
-green="#[fg=colour82]"
-blue="#[fg=colour33]"
-white="#[fg=colour15]"
+source $here/colors.conf
+
+red="#[fg=$tmux_red]"
+yellow="#[fg=$tmux_yellow]"
+green="#[fg=$tmux_green]"
+blue="#[fg=$tmux_blue]"
+white="#[fg=$tmux_white]"
 comma="$blue,"
 
 #jobs=$(bjobs -noheader -a -o stat)
