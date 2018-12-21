@@ -2,13 +2,13 @@
 
 # --- Parse Arguments ---
 colorscheme=${1-default}
-quiet=$2
+verbose=$2
 
 
 # --- Colorschemes ---
 blue='15 159 14 39 33 19'
 green='15 156 82 46 70 22'
-black='239 243 249 259 243 239'
+black='239 243 249 249 243 239'
 default=$blue
 
 # Set colorscheme
@@ -16,7 +16,7 @@ read -r white lightest light medium dark darkest <<<$(eval echo \$$colorscheme)
 
 
 # --- Print Colors ---
-if [[ -z $quiet ]]; then
+if [[ -n $verbose ]]; then
 	function cprint() {
 		local color=$1 value
 		value=$(eval echo \$$color)
