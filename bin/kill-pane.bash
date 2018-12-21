@@ -5,12 +5,12 @@ case "$cmd" in
 
 	# Keep pane alive if running LSF job
 	nios)
-		tmux display-message "Unable to kill pane"
+		tmux display-message "Unable to kill-pane running '$cmd'"
 		;;
 
 	# Confirm before killing pane
 	vim|ssh)
-		tmux confirm-before -p "kill-pane running $cmd? (y/n)" kill-pane
+		tmux confirm-before -p "kill-pane running '$cmd'? (y/n)" kill-pane
 		;;
 
 	# Kill pane running zsh
@@ -19,7 +19,7 @@ case "$cmd" in
 		;;
 
 	*)
-		tmux confirm-before -p "kill-pane running $cmd? (y/n)" kill-pane
+		tmux confirm-before -p "kill-pane running '$cmd'? (y/n)" kill-pane
 		;;
 esac
 
