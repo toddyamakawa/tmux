@@ -1,0 +1,45 @@
+#!/usr/bin/env zsh
+
+# --- Parse Arguments ---
+colorscheme=${1-default}
+quiet=$2
+
+
+# --- Colorschemes ---
+blue='15 159 14 39 33 19'
+green='15 156 82 46 70 22'
+black='239 243 249 259 243 239'
+default=$blue
+
+# Set colorscheme
+read -r white lightest light medium dark darkest <<<$(eval echo \$$colorscheme)
+
+
+# --- Print Colors ---
+if [[ -z $quiet ]]; then
+	function cprint() {
+		local color=$1 value
+		value=$(eval echo \$$color)
+		echo "\x1b[38;5;${value}m${color}"
+	}
+	cprint white
+	cprint lightest
+	cprint light
+	cprint medium
+	cprint dark
+	cprint darkest
+fi
+
+
+# --- Set tmux Colors ---
+
+# Pane borders
+tmux set-option -g pane-border-fg        colour$darkest
+tmux set-option -g pane-active-border-fg colour$medium
+
+# Status bar
+tmux set-option        -g status-fg                colour$dark
+tmux set-window-option -g window-status-fg         colour$white
+tmux set-window-option -g window-status-current-fg colour$light
+tmux set-window-option -g window-status-last-fg    colour$lightest
+
