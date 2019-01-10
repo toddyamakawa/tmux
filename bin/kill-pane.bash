@@ -13,8 +13,8 @@ case "$cmd" in
 		tmux confirm-before -p "kill-pane running '$cmd'? (y/n)" kill-pane
 		;;
 
-	# Kill pane running zsh
-	zsh)
+	# Kill pane running certain processes
+	less|zsh)
 		tmux kill-pane
 		;;
 
