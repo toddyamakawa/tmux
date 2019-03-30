@@ -1,3 +1,6 @@
 [submodule "plugins/tpm"]
 	path = plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "plugins/tmux-picker"]
+	path = plugins/tmux-picker
+	url = https://github.com/toddyamakawa/tmux-picker
