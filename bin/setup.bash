@@ -36,6 +36,7 @@ fi
 
 # Install plugins
 echo "Installing tmux plugins..." 1>&5
+_git submodule update --init --remote --recursive
 tmux run-shell $top/plugins/tpm/bin/clean_plugins
 tmux run-shell $top/plugins/tpm/bin/install_plugins
 tmux run-shell "$top/plugins/tpm/bin/update_plugins all"
