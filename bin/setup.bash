@@ -23,7 +23,7 @@ current_tmux_conf=$(readlink -f ~/.tmux)
 # Create ~/.tmux symlink
 if [[ $current_tmux != $top ]]; then
 	echo "Creating ~/.tmux symlink..." 1>&5
-	[[ -e $~/.tmux ]] && rm ~/.tmux
+	[[ -e ~/.tmux ]] && rm ~/.tmux
 	ln -sf $top ~/.tmux
 fi
 
