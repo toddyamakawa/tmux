@@ -31,5 +31,5 @@ else
 fi
 
 # Print usage% with tmux format
-echo "#[fg=colour$color]$pusage%#[fg=default]"
+echo "#[fg=colour$color][$pusage%]#[fg=default]"
 

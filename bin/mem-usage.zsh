@@ -6,6 +6,6 @@ awk '
 	/^Cached:/       { cached=$2 }
 	/^Shmem:/        { shmem=$2 }
 	/^SReclaimable:/ { srec=$2 }
-	END { printf "%0.1f/%d GB", (total-free-buffers-cached+shmem-srec)/1048576, total/1048576 }
+	END { printf "[%0.1f/%d GB]", (total-free-buffers-cached+shmem-srec)/1048576, total/1048576 }
 ' /proc/meminfo
 
