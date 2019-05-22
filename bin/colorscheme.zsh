@@ -12,7 +12,9 @@ green='15 156 82 46 70 22'
 blue='15 159 14 39 33 19'
 purple='15 147 141 129 93 53'
 black='239 243 249 249 243 239'
+
 default=$blue
+[[ -n $LSB_BATCH_JID ]] && default=$yellow
 
 # Set colorscheme
 read -r white lightest light medium dark darkest <<<$(eval echo \$$colorscheme)
