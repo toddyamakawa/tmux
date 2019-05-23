@@ -22,7 +22,7 @@ function list_sessions() {
 # Print failure and exit
 function fail_message() {
 	tmux display-message "$@"
-	exit 2
+	exit 0
 }
 
 # Switches to first/last session (alphabetically sorted)
@@ -38,13 +38,13 @@ target=$2
 matches=($(list_sessions | awk '$2~/'$target'/'))
 
 if [[ $direction == 'next' ]]; then
-	[[ -z $target ]] && { switch_and_exit -n; exit 0; }
+	[[ -z $target ]] && switch_and_exit -n
 	[[ -z $matches ]] && fail_message "No matches found for '$target'"
 	# TODO: Implement search and switch
 	switch_and_exit ${matches[0]}
 
 elif [[ $direction == 'prev' ]]; then
-	[[ -z $target ]] && { switch_and_exit -p; exit 0; }
+	[[ -z $target ]] && switch_and_exit -p
 	[[ -z $matches ]] && fail_message "No matches found for '$target'"
 	# TODO: Implement search and switch
 	switch_and_exit ${matches[0]}
