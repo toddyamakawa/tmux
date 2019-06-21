@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# vim: ft=sh
+
+# Rename tmux window
+tmux rename-window lsf
+
+# LSF options
+_LSF_DESCRIPTION=regress_tb-EA-sim_mti
+_LSF_RUNLIMIT=685:30
+_LSF_RHE='(rhe7||rhe6)'
+
+mrun=/arm/tools/setup/bin/mrun
+eval exec $mrun +arm +arm/cluster bsub \
+	-Jd $_LSF_DESCRIPTION \
+	-R "'select[$_LSF_RHE && x86_64 && os64]'" \
+	-W $_LSF_RUNLIMIT -M 16384000 \
+	-app FG \
+	-Is \
+	-XF \
+	-- \
+	/arm/tools/zsh/zsh/5.0.2/rhe6-x86_64/bin/zsh
+
