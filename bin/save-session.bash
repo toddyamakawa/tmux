@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 session=${1-$(tmux display-message -p "#{session_name}")}
 declare -r now=$(date +%Y%m%d-%H%M%S-Week%U-%a-%T)
-declare -r backup_dir=$HOME/.tmux/save/$session
+declare -r backup_dir=$HOME/.tmux/saved-sessions/$session
 declare -r backup_file=$backup_dir/$now.tmux
 
 # Save tmux panes in target session to .tmux file

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 session=${1-$(tmux display-message -p "#{session_name}")}
-declare -r backup_dir=$HOME/.tmux/save/$session
+declare -r backup_dir=$HOME/.tmux/saved-sessions/$session
 declare -r save_file=$(ls -1 $backup_dir/*.tmux |& tail -1)
 
 # Find save file
