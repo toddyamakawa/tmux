@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 declare -r tmux_dir=$HOME/.tmux
 declare -r remote_root_conf=$tmux_dir/key-bindings/remote.generated.conf
+chameleon=$tmux/plugins/tmux-chameleon/scripts/colorscheme.bash
 
 # Generate config file
 if [[ ! -f $remote_root_conf ]]; then
@@ -8,7 +9,7 @@ if [[ ! -f $remote_root_conf ]]; then
 		awk '{print "bind-key -n "$4" send-keys "$4}' > \
 		$remote_root_conf
 	echo "source-file $tmux_dir/key-bindings/remote.conf" >> $remote_root_conf
-	echo "run-shell '$tmux_dir/bin/colorscheme.zsh black'" >> $remote_root_conf
+	echo "run-shell '$chameleon black'" >> $remote_root_conf
 fi
 
 # Source config file
