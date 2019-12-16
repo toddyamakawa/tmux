@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'fileutils'
 require 'open3'
 require 'yaml'
 
@@ -33,18 +34,19 @@ today = Time.now.strftime('%Y-%m-%d')
 pane_info = ['window_index', 'window_name', 'window_layout', 'pane_current_path']
 pane_format = pane_info.map { |info| "\#{#{info}}" }.join("\t")
 
+# For each session
 sessions.each do |session_name|
-	save_file = "#{backup_dir}/#{session_name}/#{today}.yaml"
 
 	# Get window/pane info from session
 	session_info_cmd = ['tmux', 'list-panes', '-F', pane_format, '-s', '-t', session_name]
 	stdout, stderr, status = Open3.capture3(*session_info_cmd)
 	if status.exitstatus != 0
 		$stderr.puts stderr unless stderr.empty?
-		$stderr.puts "Command '#{$1.join(' ')}' failed"
+		$stderr.puts "Command '#{session_info_cmd.join(' ')}' failed"
 		exit status.exitstatus
 	end
 
+	# Generate hash of information
 	info = Hash.new
 	stdout.split("\n").each do |line|
 		index, name, layout, path = line.split("\t")
@@ -56,7 +58,10 @@ sessions.each do |session_name|
 		info[index]['panes'].append(path)
 	end
 
+	# Write sesion information to .yaml file
+	save_file = "#{backup_dir}/#{session_name}/#{today}.yaml"
+	FileUtils.mkdir_p(File.dirname(save_file))
 	File.write(save_file, info.to_yaml)
-end
 
+end # for each session
 
