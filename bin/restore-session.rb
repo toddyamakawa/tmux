@@ -21,7 +21,7 @@ end
 # ==============================================================================
 def tmux_has_session(session_name)
 	has_session_cmd = ['tmux', 'has-session', '-t', session_name]
-	stdout, stderr, status = Open3.capture3(*has_session_cmd, session_name)
+	stdout, stderr, status = Open3.capture3(*has_session_cmd)
 	return status.exitstatus == 0
 end
 
@@ -59,7 +59,7 @@ sessions.each do |session_name|
 		window_info['panes'].each do |path|
 
 			# Create new session if it doesn't exist
-			if tmux_has_session(session_name)
+			if not tmux_has_session(session_name)
 				new_session_cmd = ['tmux', 'new-session', '-d']
 				new_session_cmd += ['-s', session_name]
 				new_session_cmd += ['-n', name] unless name.nil?
@@ -68,7 +68,8 @@ sessions.each do |session_name|
 				new_session_cmd += [shell]
 				stdout, stderr, status = Open3.capture3(*new_session_cmd)
 				if status.exitstatus != 0
-					$stderr.puts "Unable to create new session for '#{session_name}'"
+					$stderr.puts "ERROR: Unable to create new session for '#{session_name}'"
+					$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
 					exit status.exitstatus
 				end
 				pane_id = stdout.chomp
@@ -77,13 +78,15 @@ sessions.each do |session_name|
 			elsif prev_index != index
 
 				new_window_cmd = ['tmux', 'new-window']
+				new_window_cmd += ['-t', session_name]
 				new_window_cmd += ['-n', name] unless name.nil?
 				new_window_cmd += ['-c', path] if File.directory?(path)
 				new_window_cmd += ['-P', '-F', '#{pane_id}']
 				new_window_cmd += [shell]
 				stdout, stderr, status = Open3.capture3(*new_window_cmd)
 				if status.exitstatus != 0
-					$stderr.puts "Unable to create new window index '#{index}'"
+					$stderr.puts "ERROR: Unable to create new window index '#{index}'"
+					$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
 					exit status.exitstatus
 				end
 				pane_id = stdout.chomp
@@ -97,7 +100,8 @@ sessions.each do |session_name|
 				split_window_cmd += [shell]
 				stdout, stderr, status = Open3.capture3(*split_window_cmd)
 				if status.exitstatus != 0
-					$stderr.puts "Unable to create new window index '#{index}'"
+					$stderr.puts "ERROR: Unable to create new window index '#{index}'"
+					$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
 					exit status.exitstatus
 				end
 			end
