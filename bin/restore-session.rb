@@ -8,6 +8,8 @@ require 'yaml'
 # ==============================================================================
 usage = "USAGE: #{$0} [SESSION]..."
 
+$dryrun = false
+
 # Get sessions to restore
 sessions = ARGV
 if sessions.empty?
@@ -22,7 +24,15 @@ end
 def tmux_has_session(session_name)
 	has_session_cmd = ['tmux', 'has-session', '-t', session_name]
 	stdout, stderr, status = Open3.capture3(*has_session_cmd)
-	return status.exitstatus == 0
+	if $dryrun
+		if status.exitstatus == 0
+			return true
+		else
+			return $dryrun_session
+		end
+	else
+		return status.exitstatus == 0
+	end
 end
 
 
@@ -48,6 +58,7 @@ sessions.each do |session_name|
 	# Initialize variables
 	pane_id = nil
 	prev_index = -1
+	$dryrun_session = false
 
 	# For each window
 	session_info.each do |index, window_info|
@@ -66,30 +77,42 @@ sessions.each do |session_name|
 				new_session_cmd += ['-c', path] if File.directory?(path)
 				new_session_cmd += ['-P', '-F', '#{pane_id}']
 				new_session_cmd += [shell]
-				stdout, stderr, status = Open3.capture3(*new_session_cmd)
-				if status.exitstatus != 0
-					$stderr.puts "ERROR: Unable to create new session for '#{session_name}'"
-					$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
-					exit status.exitstatus
+
+				if $dryrun
+					$dryrun_session = true
+					p new_session_cmd
+					pane_id = '%1'
+				else
+					stdout, stderr, status = Open3.capture3(*new_session_cmd)
+					if status.exitstatus != 0
+						$stderr.puts "ERROR: Unable to create new session for '#{session_name}'"
+						$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
+						exit status.exitstatus
+					end
+					pane_id = stdout.chomp
 				end
-				pane_id = stdout.chomp
 
 			# Create new window
 			elsif prev_index != index
-
 				new_window_cmd = ['tmux', 'new-window']
 				new_window_cmd += ['-t', session_name]
 				new_window_cmd += ['-n', name] unless name.nil?
 				new_window_cmd += ['-c', path] if File.directory?(path)
 				new_window_cmd += ['-P', '-F', '#{pane_id}']
 				new_window_cmd += [shell]
-				stdout, stderr, status = Open3.capture3(*new_window_cmd)
-				if status.exitstatus != 0
-					$stderr.puts "ERROR: Unable to create new window index '#{index}'"
-					$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
-					exit status.exitstatus
+
+				if $dryrun
+					p new_window_cmd
+					pane_id = '%2'
+				else
+					stdout, stderr, status = Open3.capture3(*new_window_cmd)
+					if status.exitstatus != 0
+						$stderr.puts "ERROR: Unable to create new window index '#{index}'"
+						$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
+						exit status.exitstatus
+					end
+					pane_id = stdout.chomp
 				end
-				pane_id = stdout.chomp
 				#puts "New window pane ID: #{pane_id}"
 
 			# Split current window to create a new pane
@@ -98,11 +121,23 @@ sessions.each do |session_name|
 				split_window_cmd += ['-t', pane_id] unless pane_id.nil?
 				split_window_cmd += ['-c', path] if File.directory?(path)
 				split_window_cmd += [shell]
-				stdout, stderr, status = Open3.capture3(*split_window_cmd)
-				if status.exitstatus != 0
-					$stderr.puts "ERROR: Unable to create new window index '#{index}'"
-					$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
-					exit status.exitstatus
+				layout_cmd = ['tmux', 'select-layout', '-t', pane_id, '-E']
+
+				if $dryrun
+					p split_window_cmd
+					p layout_cmd
+				else
+					stdout, stderr, status = Open3.capture3(*split_window_cmd)
+					if status.exitstatus != 0
+						$stderr.puts "ERROR: Unable to split window '#{index}'"
+						$stderr.puts "tmux error: '#{stderr}'" unless stderr.empty?
+						exit status.exitstatus
+					end
+					stdout, stderr, status = Open3.capture3(*layout_cmd)
+					if status.exitstatus != 0
+						$stderr.puts "Unable to select layout for '#{index}'"
+						exit status.exitstatus
+					end
 				end
 			end
 
@@ -113,10 +148,14 @@ sessions.each do |session_name|
 		# Select layout after panes are created
 		if layout
 			layout_cmd = ['tmux', 'select-layout', '-t', pane_id, layout]
-			stdout, stderr, status = Open3.capture3(*layout_cmd)
-			if status.exitstatus != 0
-				$stderr.puts "Unable to select layout for '#{index}'"
-				exit status.exitstatus
+			if $dryrun
+				p layout_cmd
+			else
+				stdout, stderr, status = Open3.capture3(*layout_cmd)
+				if status.exitstatus != 0
+					$stderr.puts "Unable to select layout for '#{index}'"
+					exit status.exitstatus
+				end
 			end
 		end
 
