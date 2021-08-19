@@ -34,6 +34,12 @@ if [[ $current_tmux_conf != $top/tmux.conf ]]; then
 	ln -sf $top/tmux.conf ~/.tmux.conf
 fi
 
+# TODO: Use submodules
+# Clone plugins
+git clone git@github.com:toddyamakawa/tmux-chameleon.git $top/plugins/tmux-chameleon
+git clone git@github.com:toddyamakawa/tmux-prefixless.git $top/plugins/tmux-prefixless
+git clone git@github.com:toddyamakawa/tmux-scratchpad.git $top/plugins/tmux-scratchpad
+
 # Install plugins
 echo "Installing tmux plugins..." 1>&5
 _git submodule update --init --remote --recursive
